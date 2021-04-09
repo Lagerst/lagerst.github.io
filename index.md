@@ -38,11 +38,11 @@
 The first menu item (on OS X, just next to the Apple logo) will not show as what you set. MacOS set it to CFBundleDisplayName in plist.info automatically, although you have tried to set it to a "NEW" value.
 
 ```obj-c
-    NSMenu* main_menu = [[NSMenu alloc] initWithTitle:@""];
-    [NSApp setMainMenu:main_menu];
-    [main_menu addItemWithTitle:@"NEW"
-                                action:nil
-                                keyEquivalent:@""];
+NSMenu* main_menu = [[NSMenu alloc] initWithTitle:@""];
+[NSApp setMainMenu:main_menu];
+[main_menu addItemWithTitle:@"NEW"
+                            action:nil
+                            keyEquivalent:@""];
 ```
 
 This App will never show as expected. At a certain time (don't knows when, maybe somewhere before applicationDidFinishLaunching and after viewDidLoad which is tested in a simple demo Cocoa App), the sytem override the item to default name "test".
@@ -50,18 +50,18 @@ This App will never show as expected. At a certain time (don't knows when, maybe
 However, we find a way to rename it to the value we expected. By doing the following steps at a **good** time, we can successfully set it to expected value. 
 
 ```obj-c
-    NSMenu* root_menu = [NSApp mainMenu];
-    NSMenu* app_menu = [[root_menu itemAtIndex:0] submenu];
-    {
-        // system will not update if it is not changed (the value inside).
-        [app_menu setTitle:@"reset"];
-    }
-    [app_menu setTitle:@"NEW"];
+NSMenu* root_menu = [NSApp mainMenu];
+NSMenu* app_menu = [[root_menu itemAtIndex:0] submenu];
+{
+    // system will not update if it is not changed (the value inside).
+    [app_menu setTitle:@"reset"];
+}
+[app_menu setTitle:@"NEW"];
 ```
 
 Do notice that it might not work if you do it at an very early time, so process again after the app override it to CFBundleDisplayName.
 
-But do also notice what we had done in brackets: we set it to a "reset" status first. We notice that the code above might not work without this step in a certain situation: we already set it to "NEW"(expected name) at an early time, and system set it to "test"(CFBundleDisplayName) after my first setting (we do not know which will happen first). We detected this change (or not) at runtime and want to do it again to correct it, which fails to work if do so without a "reset". We suspect that the system stored the value we previously set. While we set it to "NEW" a second time, it compare the value with the title stored: no changes detected. So the system just skip the change. So, we add the steps in brackets to ensure system rerender the menu bar.
+Do also notice what we had done in brackets: we set it to a "reset" status first. We notice that the code above might not work without this step in a certain situation: we already set it to "NEW"(expected name) at an early time, and system set it to "test"(CFBundleDisplayName) after my first setting (we do not know which will happen first). We detected this change (or not) at runtime and want to do it again to correct it, which fails to work if do so without a "reset". We suspect that the system stored the value we previously set. While we set it to "NEW" a second time, it compare the value with the title stored: no changes detected. So the system just skip the change. So, we add the steps in brackets to ensure system rerender the menu bar.
 
 ### [MacOS] Launch a Privileged Task
 
@@ -74,3 +74,27 @@ On posix system files created by privieged task via base::File::FLAG_CREATE in c
 ```
 which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and may never able to read/write the file, which is fatal to some settings stored in local disk.
 So avoid such operation in privileged tasks, some files may be overwriten by deleting & recreating to overwritten, so they will also have the problem.
+
+### [MasOS] Disable a Menu Item on Menu Bar
+
+[validateMenuItem](https://developer.apple.com/documentation/appkit/nsmenuitemvalidation/3005191-validatemenuitem?language=objc) is implemented to override the default action of enabling or disabling a specific menu item.
+
+The object implementing this method must be the target of menuItem. You can determine which menu item menuItem is by querying it for its tag or action.
+
+```obj-c
+@interface handler : NSObject {}
+- (BOOL)validateMenuItem:(NSMenuItem*)item;
+@end
+@implementation handler
+- (BOOL)validateMenuItem:(NSMenuItem*)item {
+  SEL theAction = [item action];
+  if (ItemShouldDisable(item)) {
+    // SEL [item action] or tag
+    return NO;
+  }
+  return YES;
+}
+@end
+
+[menu_item setTarget:new handler()]
+```
