@@ -33,7 +33,7 @@
 ```
 
 
-### [MacOS] Customize the app name on menu bar
+### [MacOS] Customize the AppName on Menu Bar
 
 The first menu item (on OS X, just next to the Apple logo) will not show as what you set. MacOS set it to CFBundleDisplayName in plist.info automatically, although you have tried to set it to a "NEW" value.
 
@@ -61,10 +61,9 @@ However, we find a way to rename it to the value we expected. By doing the follo
 
 Do notice that it might not work if you do it at an very early time, so process again after the app override it to CFBundleDisplayName.
 
-But do also notice what we had done in brackets: we set it to a "reset" status first. We notice that the code above might not work without this step in a certain situation: we already set it to "NEW"(expected name) at an early time, and system set it to "test"(CFBundleDisplayName) after my first setting (we do not know which will happen first). We detected this change (or not) at runtime and want to do it again to correct it, which fails to work if do so without a "reset". 
-We suspect that the system stored the value we previously set, while we set it to "NEW" a second time, it compare the value with the title stored: no changes detected. So the system just skip the change. So, we add the steps in brackets to ensure system rerender the menu bar.
+But do also notice what we had done in brackets: we set it to a "reset" status first. We notice that the code above might not work without this step in a certain situation: we already set it to "NEW"(expected name) at an early time, and system set it to "test"(CFBundleDisplayName) after my first setting (we do not know which will happen first). We detected this change (or not) at runtime and want to do it again to correct it, which fails to work if do so without a "reset". We suspect that the system stored the value we previously set. While we set it to "NEW" a second time, it compare the value with the title stored: no changes detected. So the system just skip the change. So, we add the steps in brackets to ensure system rerender the menu bar.
 
-### How to launch a Privileged Task on Mac
+### [MacOS] Launch a Privileged Task
 
 Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
 
