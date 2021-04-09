@@ -37,4 +37,4 @@ On posix system files created by privieged task via base::File::FLAG_CREATE in c
     int mode = S_IRUSR | S_IWUSR;
 ```
 which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and may never able to read/write the file, which is fatal to some settings stored in local disk.
-So avoid such operation in privileged tasks to communicate or store application status. Some files may be overrided by deleting & recreating to overwrite, so they will also have the problem.
+So avoid such operation in privileged tasks, some files may be overwriten by deleting & recreating to overwritten, so they will also have the problem.
