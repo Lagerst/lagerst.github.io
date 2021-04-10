@@ -157,7 +157,7 @@ The object implementing this method must be the target of menuItem. You can dete
 [menu_item setTarget:new handler()]
 ```
 
-### Tada
+### [Final] Tada
 
 Thanks for Reading! 
 
