@@ -62,7 +62,6 @@ console.log(addon.hello()); // 'world'
 ``` 
 
 Advanced Usage:
-
 If you want to invoke a async callback for current node.js loop or from another thread, you can wrap a **async_task** based on [libuv](http://libuv.org/).
 
 ### [Windows] AppUserModelID
