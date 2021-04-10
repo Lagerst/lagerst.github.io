@@ -70,11 +70,11 @@ In Windows 7 (or above), taskbar items are grouped by a string known as the appl
   store->GetValue(PKEY_AppUserModel_ID, &pv);
   if (pv.vt != VT_EMPTY) {
     if (pv.vt != VT_LPWSTR) {
-      die("Type: ", pv.vt, "Unexpected property value type");
+      Error("Unexpected property value type = ", pv.vt);
     }
-    wcout << "Current AppId: " << pv.pwszVal << endl;
+    CurrentAppId(pv.pwszVal)
   } else {
-    cout << "No current AppId" << endl;
+    NoCurrentAppId();
   }
   PropVariantClear(&pv);
   // Set AppUserModelID;
