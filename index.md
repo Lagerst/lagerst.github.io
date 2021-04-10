@@ -91,6 +91,51 @@ file->Release();
 link->Release();	
 ```
 
+### [MacOS] Set Default About Panel
+
+Take electron's implementation as a reference.
+
+```obj-c
+base::DictionaryValue about_panel_options_ = {};
+// about_panel_options_ is a base::DictionaryValue with
+//    applicationName String (optional) - The app's name.
+//    applicationVersion String (optional) - The app's version.
+//    copyright String (optional) - Copyright information.
+//    version String (optional) macOS - The app's build version number.
+//    credits String (optional) macOS Windows - Credit information.
+//    authors String[] (optional) Linux - List of app authors.
+//    website String (optional) Linux - The app's website.
+//    iconPath String (optional) Linux Windows - Path to the app's icon in a JPEG or PNG file format. On Linux, will be shown as 64x64 pixels while retaining aspect ratio.
+
+NSDictionary* options = DictionaryValueToNSDictionary(about_panel_options_);
+
+// Credits must be a NSAttributedString instead of NSString
+id credits = options[@"Credits"];
+if (credits != nil) {
+  NSMutableDictionary* mutable_options = [options mutableCopy];
+  NSDictionary* styles =
+      @{NSFontAttributeName : [NSFont systemFontOfSize:10]};
+  mutable_options[@"Credits"] =
+      [[[NSAttributedString alloc] initWithString:(NSString*)credits
+                                        attributes:styles] autorelease];
+  options = [NSDictionary dictionaryWithDictionary:mutable_options];
+}
+
+[[AtomApplication sharedApplication]
+    orderFrontStandardAboutPanelWithOptions:options];
+```
+
+This will set the about panel options. This will override the values defined in the app's `.plist` file on macOS. See the [Apple](https://developer.apple.com/documentation/appkit/nsapplication/1428479-orderfrontstandardaboutpanelwith?preferredLanguage=occ) docs for more details. On Linux `GTK_ABOUT_DIALOG` is used, and values must be set in order to be shown; there are no defaults.
+
+If you do not set credits but still wish to surface them in your app, AppKit will look for a file named "Credits.html", "Credits.rtf", and "Credits.rtfd", in that order, in the bundle returned by the NSBundle class method main. The first file found is used, and if none is found, the info area is left blank. See Apple documentation for more information.
+
+### [MacOS] Launch a Privileged Task
+
+Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
+
+Special Notes:
+On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
+
 ### [MacOS] Customize the AppName on Menu Bar
 
 The first menu item (on OS X, just next to the Apple logo) will not show as what you set. MacOS set it to CFBundleDisplayName in plist.info automatically, although you have tried to set it to a "NEW" value.
@@ -120,13 +165,6 @@ NSMenu* app_menu = [[root_menu itemAtIndex:0] submenu];
 Do notice that it might not work if you do it at an very early time, so process again after the app override it to CFBundleDisplayName.
 
 Do also notice what we had done in brackets: we set it to a "reset" status first. We notice that the code above might not work without this step in a certain situation: we already set it to "NEW"(expected name) at an early time, and system set it to "test"(CFBundleDisplayName) after my first setting (we do not know which will happen first). We detected this change (or not) at runtime and want to do it again to correct it, which fails to work if do so without a "reset". We suspect that the system stored the value we previously set. While we set it to "NEW" a second time, it compare the value with the title stored: no changes detected. So the system just skip the change. So, we add the steps in brackets to ensure system rerender the menu bar.
-
-### [MacOS] Launch a Privileged Task
-
-Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
-
-Special Notes:
-On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
 
 ### [MasOS] Disable a Menu Item on Menu Bar
 
