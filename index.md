@@ -32,6 +32,64 @@
           .A3hH@#5S553&@@#h   i:i9S          #@@@@@@@@@@@@@@@@@@@@@@@@@A.
 ```
 
+### [Windows] AppUserModelID
+
+The application id (System.AppUserModel.ID property) of a Windows 7 shortcut.
+
+In Windows 7 (or above), taskbar items are grouped by a string known as the application id or AppId. This can be set in the shortcut that launches a program, or by the application itself. See [AppUserModelIDs](http://msdn.microsoft.com/en-us/library/dd378459%28VS.85%29.aspx) for more information. There's a [tool](https://code.google.com/archive/p/win7appid/) to modify the AppUserModelID, from where we can learn to modify it in our own code.
+
+```c++
+  EXTERN_C const PROPERTYKEY DECLSPEC_SELECTANY PKEY_AppUserModel_ID = {
+      {0x9F4C2855,
+       0x9F79,
+       0x4B39,
+       {
+           0xA8,
+           0xD0,
+           0xE1,
+           0xD4,
+           0x2D,
+           0xE1,
+           0xD5,
+           0xF3,
+       }},
+      5};
+
+  // Need addtional fault tolerance mechanism.
+  // Do Initialize;
+  CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+  IShellLink* link;
+  CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
+                   IID_PPV_ARGS(&link));
+  link->QueryInterface(IID_PPV_ARGS(&file));
+  file->Load(argv[1], STGM_READWRITE);
+  IPropertyStore* store;
+  link->QueryInterface(IID_PPV_ARGS(&store));
+  // Get AppUserModelID;
+  PROPVARIANT pv;
+  store->GetValue(PKEY_AppUserModel_ID, &pv);
+  if (pv.vt != VT_EMPTY) {
+    if (pv.vt != VT_LPWSTR) {
+      die("Type: ", pv.vt, "Unexpected property value type");
+    }
+    wcout << "Current AppId: " << pv.pwszVal << endl;
+  } else {
+    cout << "No current AppId" << endl;
+  }
+  PropVariantClear(&pv);
+  // Set AppUserModelID;
+  pv.vt = VT_LPWSTR;
+  pv.pwszVal = "new";
+  store->SetValue(PKEY_AppUserModel_ID, pv);
+  pv.pwszVal = NULL;
+  PropVariantClear(&pv);
+  store->Commit();
+  file->Save(NULL, TRUE);
+  // Release;
+  store->Release();
+  file->Release();
+  link->Release();	
+```
 
 ### [MacOS] Customize the AppName on Menu Bar
 
@@ -70,7 +128,7 @@ Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is
 Special Notes:
 On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode
 ```c
-    int mode = S_IRUSR | S_IWUSR;
+int mode = S_IRUSR | S_IWUSR;
 ```
 which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and may never able to read/write the file, which is fatal to some settings stored in local disk.
 So avoid such operation in privileged tasks, some files may be overwriten by deleting & recreating to overwritten, so they will also have the problem.
