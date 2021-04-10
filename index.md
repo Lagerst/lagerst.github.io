@@ -126,12 +126,7 @@ Do also notice what we had done in brackets: we set it to a "reset" status first
 Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
 
 Special Notes:
-On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode
-```c
-int mode = S_IRUSR | S_IWUSR;
-```
-which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and may never able to read/write the file, which is fatal to some settings stored in local disk.
-So avoid such operation in privileged tasks, some files may be overwriten by deleting & recreating to overwritten, so they will also have the problem.
+On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
 
 ### [MasOS] Disable a Menu Item on Menu Bar
 
@@ -157,9 +152,9 @@ The object implementing this method must be the target of menuItem. You can dete
 [menu_item setTarget:new handler()]
 ```
 
-### [Final] Tada
+### [Final] Tada & About Me
 
-Thanks for Reading! 
+Thanks for your reading!
 
 ```
                                       ,s555SB@@&
@@ -192,15 +187,18 @@ Thanks for Reading!
           .A3hH@#5S553&@@#h   i:i9S          #@@@@@@@@@@@@@@@@@@@@@@@@@A
 ```
 
-About Me:
+*About Me:*
 
-University of Electronic Science and Technology of China - Chengdu, Sichuan, China
-  09/2017 - 06/20201 Bachelor of Software Engineering;
+**University of Electronic Science and Technology of China** - Chengdu, Sichuan, China
 
-University of Texas at Austin - Austin, Texas, United States
-  07/2019 - 08/2019 Academic Visitor;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;09/2017 - 06/2021 Bachelor of Software Engineering;
 
-Bytedance - Beijing, China
-  03/2020 - 04/2021 Intern at Lark Team.
+**University of Texas at Austin** - Austin, Texas, United States
 
-[E-mail me](mailto:pzw9908@outlook.com) if there's a problem.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;07/2019 - 08/2019 Academic Visitor;
+
+**ByteDance** - Beijing, China
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;03/2020 - 04/2021 Intern at Lark Team.
+
+[E-mail](mailto:pzw9908@outlook.com) me if there's any problem.
