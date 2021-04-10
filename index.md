@@ -192,4 +192,15 @@ Thanks for Reading!
           .A3hH@#5S553&@@#h   i:i9S          #@@@@@@@@@@@@@@@@@@@@@@@@@A
 ```
 
+About Me:
+
+University of Electronic Science and Technology of China - Chengdu, Sichuan, China
+  09/2017 - 06/20201 Bachelor of Software Engineering;
+
+University of Texas at Austin - Austin, Texas, United States
+  07/2019 - 08/2019 Academic Visitor;
+
+Bytedance - Beijing, China
+  03/2020 - 04/2021 Intern at Lark Team.
+
 [E-mail me](mailto:pzw9908@outlook.com) if there's a problem.
