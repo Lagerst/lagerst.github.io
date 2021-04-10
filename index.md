@@ -39,56 +39,56 @@ The application id (System.AppUserModel.ID property) of a Windows 7 shortcut.
 In Windows 7 (or above), taskbar items are grouped by a string known as the application id or AppId. This can be set in the shortcut that launches a program, or by the application itself. See [AppUserModelIDs](http://msdn.microsoft.com/en-us/library/dd378459%28VS.85%29.aspx) for more information. There's a [tool](https://code.google.com/archive/p/win7appid/) to modify the AppUserModelID, from where we can learn to modify it in our own code.
 
 ```c++
-  EXTERN_C const PROPERTYKEY DECLSPEC_SELECTANY PKEY_AppUserModel_ID = {
-      {0x9F4C2855,
-       0x9F79,
-       0x4B39,
-       {
-           0xA8,
-           0xD0,
-           0xE1,
-           0xD4,
-           0x2D,
-           0xE1,
-           0xD5,
-           0xF3,
-       }},
-      5};
+EXTERN_C const PROPERTYKEY DECLSPEC_SELECTANY PKEY_AppUserModel_ID = {
+    {0x9F4C2855,
+     0x9F79,
+     0x4B39,
+     {
+         0xA8,
+         0xD0,
+         0xE1,
+         0xD4,
+         0x2D,
+         0xE1,
+         0xD5,
+         0xF3,
+     }},
+    5};
 
-  // Need addtional fault tolerance mechanism.
-  // Do Initialize;
-  CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-  IShellLink* link;
-  CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
-                   IID_PPV_ARGS(&link));
-  link->QueryInterface(IID_PPV_ARGS(&file));
-  file->Load(argv[1], STGM_READWRITE);
-  IPropertyStore* store;
-  link->QueryInterface(IID_PPV_ARGS(&store));
-  // Get AppUserModelID;
-  PROPVARIANT pv;
-  store->GetValue(PKEY_AppUserModel_ID, &pv);
-  if (pv.vt != VT_EMPTY) {
-    if (pv.vt != VT_LPWSTR) {
-      _Error("Unexpected property value type = ", pv.vt);
-    }
-    _CurrentAppId(pv.pwszVal)
-  } else {
-    _NoCurrentAppId();
+// Need addtional fault tolerance mechanism.
+// Do Initialize;
+CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+IShellLink* link;
+CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
+                 IID_PPV_ARGS(&link));
+link->QueryInterface(IID_PPV_ARGS(&file));
+file->Load(argv[1], STGM_READWRITE);
+IPropertyStore* store;
+link->QueryInterface(IID_PPV_ARGS(&store));
+// Get AppUserModelID;
+PROPVARIANT pv;
+store->GetValue(PKEY_AppUserModel_ID, &pv);
+if (pv.vt != VT_EMPTY) {
+  if (pv.vt != VT_LPWSTR) {
+    _Error("Unexpected property value type = ", pv.vt);
   }
-  PropVariantClear(&pv);
-  // Set AppUserModelID;
-  pv.vt = VT_LPWSTR;
-  pv.pwszVal = "new";
-  store->SetValue(PKEY_AppUserModel_ID, pv);
-  pv.pwszVal = NULL;
-  PropVariantClear(&pv);
-  store->Commit();
-  file->Save(NULL, TRUE);
-  // Release;
-  store->Release();
-  file->Release();
-  link->Release();	
+  _CurrentAppId(pv.pwszVal)
+} else {
+  _NoCurrentAppId();
+}
+PropVariantClear(&pv);
+// Set AppUserModelID;
+pv.vt = VT_LPWSTR;
+pv.pwszVal = "new";
+store->SetValue(PKEY_AppUserModel_ID, pv);
+pv.pwszVal = NULL;
+PropVariantClear(&pv);
+store->Commit();
+file->Save(NULL, TRUE);
+// Release;
+store->Release();
+file->Release();
+link->Release();	
 ```
 
 ### [MacOS] Customize the AppName on Menu Bar
