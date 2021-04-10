@@ -32,6 +32,39 @@
           .A3hH@#5S553&@@#h   i:i9S          #@@@@@@@@@@@@@@@@@@@@@@@@@A
 ```
 
+### [Cross Platform] Node-Addon-Api: C++ addon for node.js
+
+To run native C++ code in node.js, you can use [node-addon-api](https://github.com/nodejs/node-addon-api). [Examples](https://github.com/nodejs/node-addon-examples) are given here. Also a [desktop camera](https://github.com/Lagerst/DesktopCamera) is implemented with Electron and opencv by me.
+
+```C++
+// sample.cc
+#include <napi.h>
+
+Napi::String Method(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  return Napi::String::New(env, "world");
+}
+
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set(Napi::String::New(env, "hello"),
+              Napi::Function::New(env, Method));
+  return exports;
+}
+
+NODE_API_MODULE(hello, Init)
+
+// sample.js
+var addon = require('bindings')('hello');
+console.log(addon.hello()); // 'world'
+
+// package.json -
+// binding.gyp -
+``` 
+
+Advanced Usage:
+
+If you want to invoke a async callback for current node.js loop or from another thread, you can wrap a **async_task** based on [libuv](http://libuv.org/).
+
 ### [Windows] AppUserModelID
 
 The application id (System.AppUserModel.ID property) of a Windows 7 shortcut.
