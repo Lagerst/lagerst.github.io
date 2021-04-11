@@ -32,6 +32,12 @@ console.log(addon.hello()); // 'world'
 Advanced Usage:
 If you want to invoke a async callback for current node.js loop or from another thread, you can wrap a **async_task** based on [libuv](http://libuv.org/).
 
+### [Cross Platform] Google Crashpad
+
+[Overview Design](https://chromium.googlesource.com/crashpad/crashpad/+/master/doc/overview_design.md)
+
+[Source Code](https://chromium.googlesource.com/crashpad/crashpad/)
+
 ### [Windows] MSVC Compiler Options /MD, /MT 
 
 [(Use Run-Time Library)](https://docs.microsoft.com/en-us/cpp/build/reference/md-mt-ld-use-run-time-library?view=msvc-160) Indicates whether a multithreaded module is a DLL and specifies retail or debug versions of the run-time library.
@@ -64,6 +70,14 @@ Notes:
 1. Anyway, a release and debug versions of the same module should link with the same category of runtime. If your release links with MT, then your debug should link with MTd. In the same way, if your release links with MD, your debug should link with MD\[d\].
 
 2. Now, you should avoid mixing in the same process different modules linked with different run times (Note that the release and debug run times are different run times). violating this rule could lead to mysterious crashes. Potential errors are given [here](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2012/ms235460(v=vs.110)?redirectedfrom=MSDN). When you pass C Run-time (CRT) objects such as file handles, locales, and environment variables into or out of a DLL (function calls across the DLL boundary), unexpected behavior can occur if the DLL, as well as the files calling into the DLL, use different copies of the CRT libraries. A related problem can occur when you allocate memory (either explicitly with new or malloc, or implicitly with strdup, strstreambuf::str, and so on) and then pass a pointer across a DLL boundary to be freed. This can cause a memory access violation or heap corruption if the DLL and its users use different copies of the CRT libraries. Another symptom of this problem can be an error in the output window during debugging such as: `HEAP[]: Invalid Address specified to RtlValidateHeap(#,#)`.
+
+Tips:
+
+`dumpbin /directives target.lib` can be used to tell if a lib was compiled with /mt or /md:
+1. /DEFAULTLIB:MSVCRT (module compiled with /MD)
+2. /DEFAULTLIB:MSVCRTD (module compiled with /MDd)
+3. /DEFAULTLIB:LIBCMT (module compiled with /MT)
+4. /DEFAULTLIB:LIBCMTD (module compiled with /MTd)
 
 ### [Windows] AppUserModelID
 
