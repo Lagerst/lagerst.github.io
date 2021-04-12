@@ -2,7 +2,7 @@
 
 ### [Cross Platform] Node-Addon-Api: C++ addon for node.js
 
-To run native C++ code in node.js, you can use [node-addon-api](https://github.com/nodejs/node-addon-api). [Examples](https://github.com/nodejs/node-addon-examples) are given here. Also a [desktop camera](https://github.com/Lagerst/DesktopCamera) is implemented with Electron and opencv by me.
+To run native C++ code in node.js, you can use [node-addon-api](https://github.com/nodejs/node-addon-api). [Examples](https://github.com/nodejs/node-addon-examples) are given here. Also a [desktop camera](https://github.com/Lagerst/DesktopCamera) is implemented with Electron and opencv in my github.
 
 ```C++
 // sample.cc
