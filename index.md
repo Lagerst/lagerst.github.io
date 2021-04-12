@@ -34,6 +34,12 @@ If you want to invoke a async callback for current node.js loop or from another 
 
 ### [Cross Platform] Google Crashpad
 
+Crashpad is a library for capturing, storing and transmitting postmortem crash reports from a client to an upstream collection server. Crashpad aims to make it possible for clients to capture process state at the time of crash with the best possible fidelity and coverage, with the minimum of fuss.
+
+Crashpad also provides a facility for clients to capture dumps of process state on-demand for diagnostic purposes.
+
+Crashpad additionally provides minimal facilities for clients to adorn their crashes with application-specific metadata in the form of per-process key/value pairs. More sophisticated clients are able to adorn crash reports further through extensibility points that allow the embedder to augment the crash report with application-specific metadata.
+
 [Overview Design](https://chromium.googlesource.com/crashpad/crashpad/+/master/doc/overview_design.md)
 
 [Source Code](https://chromium.googlesource.com/crashpad/crashpad/)
