@@ -144,6 +144,33 @@ file->Release();
 link->Release();	
 ```
 
+### [MacOS] com.apple.quarantine and App Translocation
+
+**com.apple.quarantine** is an [extended attribute](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux) which is added to a file if downloaded from the internet. The quarantine attribute is added by the OS so that it can ask for user confirmation the first time the downloaded program is run. This attribute might also be added if the file created by a process which has this attribute.
+
+In macOS Sierra, Apple added a strange security feature called **App Translocation** (sometimes known as Gatekeeper Path Randomization) which means that after downloading an application, if you do not move the resulting application somewhere (anywhere!), with the Finder (you must use the Finder!), the application will be run as if it is located at a randomly chosen path by the system. One of the consequence of this is that the version updates will fail (because the application cannot replace itself).
+
+But note that not all app with com.apple.quarantine will run as translocated. Move the app with Finder will cause the app run normally. The policy that whether the app should/is run translocated, how to check where the origin path is and some more are implemented in [Security/SecTranslocate.h](https://opensource.apple.com/source/Security/Security-57740.51.3/OSX/libsecurity_translocate/lib/SecTranslocate.h.auto.html).
+
+```obj-c
+Boolean SecTranslocateIsTranslocatedURL(CFURLRef path, bool* isTranslocated, CFErrorRef* __nullable error)
+__OSX_AVAILABLE(10.12);
+
+Boolean SecTranslocateURLShouldRunTranslocated(CFURLRef path, bool* shouldTranslocate, CFErrorRef* __nullable error)
+__OSX_AVAILABLE(10.12);
+
+CFURLRef __nullable SecTranslocateCreateOriginalPathForURL(CFURLRef translocatedPath, CFErrorRef* __nullable error)
+__OSX_AVAILABLE(10.12);
+```
+
+You can also find the translocation policy descripted in annotation as followed:
+1. If path is already on a nullfs mountpoint - no translocation
+2. No quarantine attributes - no translocation
+3. If QTN_FLAG_DO_NOT_TRANSLOCATE is set or QTN_FLAG_TRANSLOCATE is not set - no translocations
+4. Otherwise, if QTN_FLAG_TRANSLOCATE is set - translocation
+
+You can avoid App Translocation by breaking any one of the necessary conditions above. For example, remove the attribute of com.apple.quarantine.Run `xattr path/to/target` to watch all of the extended attributes and run `xattr -d -r com.apple.quarantine path/to/target` to remove the quarantine attributes.
+
 ### [MacOS] Set Default About Panel
 
 Take electron's implementation as a reference.
