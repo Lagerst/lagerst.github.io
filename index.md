@@ -27,7 +27,7 @@ console.log(addon.hello()); // 'world'
 
 // package.json -
 // binding.gyp -
-``` 
+```
 
 Advanced Usage:
 If you want to invoke a async callback for current node.js loop or from another thread, you can wrap a **async_task** based on [libuv](http://libuv.org/).
@@ -44,42 +44,46 @@ Crashpad additionally provides minimal facilities for clients to adorn their cra
 
 [Source Code](https://chromium.googlesource.com/crashpad/crashpad/)
 
-### [Windows] MSVC Compiler Options /MD, /MT 
+### [Windows] MSVC Compiler Options /MD, /MT
 
 [(Use Run-Time Library)](https://docs.microsoft.com/en-us/cpp/build/reference/md-mt-ld-use-run-time-library?view=msvc-160) Indicates whether a multithreaded module is a DLL and specifies retail or debug versions of the run-time library.
 
-/MD\[d\]	causes the application to use the multithread-specific and DLL-specific version of the run-time library.
+/MD\[d\] causes the application to use the multithread-specific and DLL-specific version of the run-time library.
 
-/MT\[d\]	causes the application to use the multithread, static version of the run-time library.
+/MT\[d\] causes the application to use the multithread, static version of the run-time library.
 
 Each time a new process attempts to use the DLL, the operating system creates a separate copy of the DLL's data: this is called "process attach". The run-time library code for the DLL calls the constructors for all the global objects, if any, and then calls the DllMain function with process attach selected. The opposite situation is process detach: the run-time library code calls DllMain with process detach selected and then calls a list of termination functions including atexit functions, destructors for the global objects, and destructors for the static objects. Note that the order of events in process attach is the reverse of that in process detach.
 The run-time library code is also called during thread attach and thread detach, but the run-time code does no initialization or termination on its own.
 
 Linking with MD has advantages:
+
 1. Different modules (i.e. DLLs or EXEs) can exchange "memory ownership". For example, a memory allocated through new/malloc in one module can be reallocated/deleted/freed by another. This is very helpful if you use STL in the interface between your modules.
 2. The runtime has some "global data". Linking with MT means that this "global data" will not be shared, while with MD, it will be shared. This means that with MD, you can pass some data from one module to another without risk.
 3. your executable can be smaller (since it doesn't have the library embedded in it), and I believe that at very least the code segment of a DLL is shared amongst all processes that are actively using it (reducing the total amount of RAM consumed).
 
 Linking with MD has disadvantages:
+
 1. while a module compiled with MD will link with a DLL at the moment of execution. if DLL will not found in the machine then your application will be crashed.
 
 Linking with MT has advantages:
+
 1. If you use /MT, your executable won't depend on a DLL being present on the target system. If you're wrapping this in an installer, it probably won't be an issue and you can go either way.
 
 To set this compiler option in the Visual Studio development environment
-  Open the project's Property Pages dialog box. For details, see Set C++ compiler and build properties in Visual Studio.
-  Select the Configuration Properties > C/C++ > Code Generation property page.
-  Modify the Runtime Library property.
+1. Open the project's Property Pages dialog box. For details, see Set C++ compiler and build properties in Visual Studio.
+2. Select the Configuration Properties > C/C++ > Code Generation property page.
+3. Modify the Runtime Library property.
 
 Notes:
 
 1. Anyway, a release and debug versions of the same module should link with the same category of runtime. If your release links with MT, then your debug should link with MTd. In the same way, if your release links with MD, your debug should link with MD\[d\].
 
-2. Now, you should avoid mixing in the same process different modules linked with different run times (Note that the release and debug run times are different run times). violating this rule could lead to mysterious crashes. Potential errors are given [here](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2012/ms235460(v=vs.110)?redirectedfrom=MSDN). When you pass C Run-time (CRT) objects such as file handles, locales, and environment variables into or out of a DLL (function calls across the DLL boundary), unexpected behavior can occur if the DLL, as well as the files calling into the DLL, use different copies of the CRT libraries. A related problem can occur when you allocate memory (either explicitly with new or malloc, or implicitly with strdup, strstreambuf::str, and so on) and then pass a pointer across a DLL boundary to be freed. This can cause a memory access violation or heap corruption if the DLL and its users use different copies of the CRT libraries. Another symptom of this problem can be an error in the output window during debugging such as: `HEAP[]: Invalid Address specified to RtlValidateHeap(#,#)`.
+2. Now, you should avoid mixing in the same process different modules linked with different run times (Note that the release and debug run times are different run times). violating this rule could lead to mysterious crashes. Potential errors are given [here](<https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2012/ms235460(v=vs.110)?redirectedfrom=MSDN>). When you pass C Run-time (CRT) objects such as file handles, locales, and environment variables into or out of a DLL (function calls across the DLL boundary), unexpected behavior can occur if the DLL, as well as the files calling into the DLL, use different copies of the CRT libraries. A related problem can occur when you allocate memory (either explicitly with new or malloc, or implicitly with strdup, strstreambuf::str, and so on) and then pass a pointer across a DLL boundary to be freed. This can cause a memory access violation or heap corruption if the DLL and its users use different copies of the CRT libraries. Another symptom of this problem can be an error in the output window during debugging such as: `HEAP[]: Invalid Address specified to RtlValidateHeap(#,#)`.
 
 Tips:
 
 `dumpbin /directives target.lib` can be used to tell if a lib was compiled with /mt or /md:
+
 1. /DEFAULTLIB:MSVCRT (module compiled with /MD)
 2. /DEFAULTLIB:MSVCRTD (module compiled with /MDd)
 3. /DEFAULTLIB:LIBCMT (module compiled with /MT)
@@ -141,7 +145,7 @@ file->Save(NULL, TRUE);
 // Release;
 store->Release();
 file->Release();
-link->Release();	
+link->Release();
 ```
 
 ### [MacOS] com.apple.quarantine and App Translocation
@@ -164,6 +168,7 @@ __OSX_AVAILABLE(10.12);
 ```
 
 The translocation policy descripted in annotation as followed:
+
 1. If path is already on a nullfs mountpoint - no translocation
 2. No quarantine attributes - no translocation
 3. If QTN_FLAG_DO_NOT_TRANSLOCATE is set or QTN_FLAG_TRANSLOCATE is not set - no translocations
@@ -230,7 +235,7 @@ NSMenu* main_menu = [[NSMenu alloc] initWithTitle:@""];
 
 This App will never show as expected. At a certain time (don't knows when, maybe somewhere before applicationDidFinishLaunching and after viewDidLoad which is tested in a simple demo Cocoa App), the sytem override the item to default name "test".
 
-However, we find a way to rename it to the value we expected. By doing the following steps at a **good** time, we can successfully set it to expected value. 
+However, we find a way to rename it to the value we expected. By doing the following steps at a **good** time, we can successfully set it to expected value.
 
 ```obj-c
 NSMenu* root_menu = [NSApp mainMenu];
@@ -305,7 +310,7 @@ Thanks for your reading!
           .A3hH@#5S553&@@#h   i:i9S          #@@@@@@@@@@@@@@@@@@@@@@@@@A
 ```
 
-*About Me:*
+_About Me:_
 
 **University of Electronic Science and Technology of China** - Chengdu, Sichuan, China
 
