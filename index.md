@@ -148,6 +148,35 @@ file->Release();
 link->Release();
 ```
 
+### [Cross Platform] Launch a Privileged Task
+
+**MacOS**
+
+Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
+
+Special Notes:
+On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
+
+**Windows**
+
+See [base/process/launch_win.cc](https://chromium.googlesource.com/chromium/src/base/+/master/process/launch_win.cc) in chromium & [Launching Applications](https://docs.microsoft.com/en-us/windows/win32/shell/launch) at Microsoft Docs.
+
+```c++
+SHELLEXECUTEINFO shex_info = {};
+shex_info.cbSize = sizeof(shex_info);
+shex_info.fMask = SEE_MASK_NOCLOSEPROCESS;
+shex_info.hwnd = GetActiveWindow();
+shex_info.lpVerb = L"runas";
+shex_info.lpFile = file.c_str();
+shex_info.lpParameters = arguments.c_str();
+shex_info.lpDirectory = nullptr;
+shex_info.nShow = options.start_hidden ? SW_HIDE : SW_SHOWNORMAL;
+shex_info.hInstApp = nullptr;
+
+ShellExecuteEx(&ShExecInfo);
+WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+```
+
 ### [MacOS] com.apple.quarantine and App Translocation
 
 In macOS Sierra, Apple added a strange security feature called **App Translocation** (sometimes known as Gatekeeper Path Randomization) which means that after downloading an application, if you do not move the resulting application somewhere (anywhere!), with the Finder (you must use the Finder!), the application will be run as if it is located at a randomly chosen path by the system. One of the consequence of this is that the version updates will fail (because the application cannot replace itself).
@@ -213,13 +242,6 @@ if (credits != nil) {
 This will set the about panel options. This will override the values defined in the app's `.plist` file on macOS. See the [Apple](https://developer.apple.com/documentation/appkit/nsapplication/1428479-orderfrontstandardaboutpanelwith?preferredLanguage=occ) docs for more details. On Linux `GTK_ABOUT_DIALOG` is used, and values must be set in order to be shown; there are no defaults.
 
 If you do not set credits but still wish to surface them in your app, AppKit will look for a file named "Credits.html", "Credits.rtf", and "Credits.rtfd", in that order, in the bundle returned by the NSBundle class method main. The first file found is used, and if none is found, the info area is left blank. See Apple documentation for more information.
-
-### [MacOS] Launch a Privileged Task
-
-Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
-
-Special Notes:
-On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
 
 ### [MacOS] Customize the AppName on Menu Bar
 
