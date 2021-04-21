@@ -30,7 +30,7 @@ console.log(addon.hello()); // 'world'
 ```
 
 Advanced Usage:
-If you want to invoke a async callback for current node.js loop or from another thread, you can wrap a **async_task** based on [libuv](http://libuv.org/).
+If you want to invoke a async callback for current node.js loop from current or another thread, you can wrap a **async_task** based on [libuv](http://libuv.org/).
 
 ### [Cross Platform] Google Crashpad
 
