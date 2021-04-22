@@ -44,6 +44,35 @@ Crashpad additionally provides minimal facilities for clients to adorn their cra
 
 [Source Code](https://chromium.googlesource.com/crashpad/crashpad/)
 
+### [Cross Platform] Launch a Privileged Task
+
+**MacOS**
+
+Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
+
+Special Notes:
+On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
+
+**Windows**
+
+See [base/process/launch_win.cc](https://chromium.googlesource.com/chromium/src/base/+/master/process/launch_win.cc) in chromium & [Launching Applications](https://docs.microsoft.com/en-us/windows/win32/shell/launch) at Microsoft Docs.
+
+```c++
+SHELLEXECUTEINFO shex_info = {};
+shex_info.cbSize = sizeof(shex_info);
+shex_info.fMask = SEE_MASK_NOCLOSEPROCESS;
+shex_info.hwnd = GetActiveWindow();
+shex_info.lpVerb = L"runas";
+shex_info.lpFile = file.c_str();
+shex_info.lpParameters = arguments.c_str();
+shex_info.lpDirectory = nullptr;
+shex_info.nShow = options.start_hidden ? SW_HIDE : SW_SHOWNORMAL;
+shex_info.hInstApp = nullptr;
+
+ShellExecuteEx(&ShExecInfo);
+WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+```
+
 ### [Windows] MSVC Compiler Options /MD, /MT
 
 [(Use Run-Time Library)](https://docs.microsoft.com/en-us/cpp/build/reference/md-mt-ld-use-run-time-library?view=msvc-160) Indicates whether a multithreaded module is a DLL and specifies retail or debug versions of the run-time library.
@@ -148,34 +177,27 @@ file->Release();
 link->Release();
 ```
 
-### [Cross Platform] Launch a Privileged Task
+### [Windows] Dynamic-Link Library Security
 
-**MacOS**
+**See [Dynamic-Link Library Security](https://docs.microsoft.com/zh-cn/windows/win32/dlls/dynamic-link-library-security)**
 
-Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
+When an application dynamically loads a dynamic-link library without specifying a fully qualified path name, Windows attempts to locate the DLL by searching a well-defined set of directories in a particular order, as described in Dynamic-Link Library Search Order. If an attacker gains control of one of the directories on the DLL search path, it can place a malicious copy of the DLL in that directory. This is sometimes called a DLL preloading attack or a binary planting attack. If the system does not find a legitimate copy of the DLL before it searches the compromised directory, it loads the malicious DLL. If the application is running with administrator privileges, the attacker may succeed in local privilege elevation.
 
-Special Notes:
-On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
+For example, suppose an application is designed to load a DLL from the user's current directory and fail gracefully if the DLL is not found. The application calls LoadLibrary with just the name of the DLL, which causes the system to search for the DLL. Assuming safe DLL search mode is enabled and the application is not using an alternate search order, the system searches directories in the following order:
+1. The directory from which the application loaded.
+2. The system directory.
+3. The 16-bit system directory.
+4. The Windows directory.
+5. The current directory.
+6. The directories that are listed in the PATH environment variable.
+Continuing the example, an attacker with knowledge of the application gains control of the current directory and places a malicious copy of the DLL in that directory. When the application issues the LoadLibrary call, the system searches for the DLL, finds the malicious copy of the DLL in the current directory, and loads it. The malicious copy of the DLL then runs within the application and gains the privileges of the user.
 
-**Windows**
+**common ways to avoid this risk**
+1. Call [SetDefaultDllDirectories](https://docs.microsoft.com/zh-cn/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories) and use [/DELAYLOAD](https://docs.microsoft.com/en-us/cpp/build/reference/delayload-delay-load-import?view=msvc-160).
+2. Some dll is loaded before main entry. Do not call them directly, instead we can call [GetProcAddress](https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress) to load the function from a dynamicly loaded DLL module handle.
 
-See [base/process/launch_win.cc](https://chromium.googlesource.com/chromium/src/base/+/master/process/launch_win.cc) in chromium & [Launching Applications](https://docs.microsoft.com/en-us/windows/win32/shell/launch) at Microsoft Docs.
-
-```c++
-SHELLEXECUTEINFO shex_info = {};
-shex_info.cbSize = sizeof(shex_info);
-shex_info.fMask = SEE_MASK_NOCLOSEPROCESS;
-shex_info.hwnd = GetActiveWindow();
-shex_info.lpVerb = L"runas";
-shex_info.lpFile = file.c_str();
-shex_info.lpParameters = arguments.c_str();
-shex_info.lpDirectory = nullptr;
-shex_info.nShow = options.start_hidden ? SW_HIDE : SW_SHOWNORMAL;
-shex_info.hInstApp = nullptr;
-
-ShellExecuteEx(&ShExecInfo);
-WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
-```
+**tools to examine DLL load operations in your application**
+[Process Monitor](https://docs.microsoft.com/en-us/sysinternals/downloads/procmon)
 
 ### [MacOS] com.apple.quarantine and App Translocation
 
