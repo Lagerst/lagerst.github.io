@@ -20,7 +20,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 }
 
 NODE_API_MODULE(hello, Init)
-
+```
+```js
 // sample.js
 var addon = require('bindings')('hello');
 console.log(addon.hello()); // 'world'
@@ -98,6 +99,7 @@ WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
 **[Mojo IPC](https://chromium.googlesource.com/chromium/src/+/master/mojo/README.md)**
 
 **Embedding Mojo**
+
 ```cpp
 mojo::core::Init();
 base::Thread ipc_thread("ipc!");
@@ -109,6 +111,7 @@ mojo::core::ScopedIPCSupport ipc_support(
 ```
 
 **[Using Named Pipe](https://source.chromium.org/chromium/chromium/src/+/main:mojo/public/cpp/platform/README.md)**
+
 A NamedPlatformChannel upon construction will begin listening on a platform-specific primitive (a named pipe server on Windows, a domain socket server on POSIX, etc.). The globally reachable name of the server (e.g. the socket path) can be specified at construction time via NamedPlatformChannel::Options::server_name, but if no name is given, a suitably random one is generated and used.
 ```cpp
 // Sending/Receiving Invitiaion.
