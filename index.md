@@ -207,20 +207,8 @@ In Windows 7 (or above), taskbar items are grouped by a string known as the appl
 
 ```cpp
 EXTERN_C const PROPERTYKEY DECLSPEC_SELECTANY PKEY_AppUserModel_ID = {
-    {0x9F4C2855,
-     0x9F79,
-     0x4B39,
-     {
-         0xA8,
-         0xD0,
-         0xE1,
-         0xD4,
-         0x2D,
-         0xE1,
-         0xD5,
-         0xF3,
-     }},
-    5};
+    {0x9F4C2855, 0x9F79, 0x4B39, {
+     0xA8, 0xD0, 0xE1, 0xD4, 0x2D, 0xE1, 0xD5, 0xF3}}, 5};
 
 // Need addtional fault tolerance mechanism.
 // Do Initialize;
