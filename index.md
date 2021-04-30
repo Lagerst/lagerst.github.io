@@ -4,7 +4,7 @@
 
 To run native C++ code in node.js, you can use [node-addon-api](https://github.com/nodejs/node-addon-api). [Examples](https://github.com/nodejs/node-addon-examples) are given here. Also a [desktop camera](https://github.com/Lagerst/DesktopCamera) is implemented with Electron and opencv in my github.
 
-```C++
+```cpp
 // sample.cc
 #include <napi.h>
 
@@ -77,7 +77,7 @@ On posix system files created by privieged task via base::File::FLAG_CREATE in c
 
 See [base/process/launch_win.cc](https://chromium.googlesource.com/chromium/src/base/+/master/process/launch_win.cc) in chromium & [Launching Applications](https://docs.microsoft.com/en-us/windows/win32/shell/launch) at Microsoft Docs.
 
-```c++
+```cpp
 SHELLEXECUTEINFO shex_info = {};
 shex_info.cbSize = sizeof(shex_info);
 shex_info.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -91,6 +91,64 @@ shex_info.hInstApp = nullptr;
 
 ShellExecuteEx(&ShExecInfo);
 WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+```
+
+### [Cross Platform] Chromium Mojo IPC
+
+**[Mojo IPC](https://chromium.googlesource.com/chromium/src/+/master/mojo/README.md)**
+
+**Embedding Mojo**
+```cpp
+mojo::core::Init();
+base::Thread ipc_thread("ipc!");
+ipc_thread.StartWithOptions(
+    base::Thread::Options(base::MessagePumpType::IO, 0));
+mojo::core::ScopedIPCSupport ipc_support(
+    ipc_thread.task_runner(),
+    mojo::core::ScopedIPCSupport::ShutdownPolicy::CLEAN);
+```
+
+**[Using Named Pipe](https://source.chromium.org/chromium/chromium/src/+/main:mojo/public/cpp/platform/README.md)**
+A NamedPlatformChannel upon construction will begin listening on a platform-specific primitive (a named pipe server on Windows, a domain socket server on POSIX, etc.). The globally reachable name of the server (e.g. the socket path) can be specified at construction time via NamedPlatformChannel::Options::server_name, but if no name is given, a suitably random one is generated and used.
+```cpp
+// Sending/Receiving Invitiaion.
+{
+  // In one process
+  mojo::NamedPlatformChannel::Options options;
+  mojo::NamedPlatformChannel named_channel(options);
+  OutgoingInvitation::Send(std::move(invitation),
+                           named_channel.TakeServerEndpoint());
+  SendServerNameToRemoteProcessSomehow(named_channel.GetServerName());
+
+  // In the other process
+  void OnGotServerName(const mojo::NamedPlatformChannel::ServerName& name) {
+    // Connect to the server.
+    mojo::PlatformChannelEndpoint endpoint =
+        mojo::NamedPlatformChannel::ConnectToServer(name);
+
+    // Proceed normally with invitation acceptance.
+    auto invitation = mojo::IncomingInvitation::Accept(std::move(endpoint));
+    // ...
+  }
+}
+// Sending/Receiving Message.
+{
+  // Optional: Wait till WRITABLE or PEER_CLOSED
+  MojoHandleSignalsState state;
+  mojo::Wait(pipe_handle_,
+             MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED,
+             &state);
+  // MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED (IF READ)
+  if (state.satisfied_signals &
+      MOJO_HANDLE_SIGNAL_WRITABLE) /* MOJO_HANDLE_SIGNAL_READABLE */ {
+    MojoResult ret =
+        mojo::WriteMessageRaw(pipe_handle_, message.c_str(), message.size(),
+                              nullptr, 0, MOJO_WRITE_MESSAGE_FLAG_NONE);
+    /*  std::vector<uint8_t> payload;
+        MojoResult ret = mojo::ReadMessageRaw(pipe_handle_, &payload, nullptr,
+                                              MOJO_READ_MESSAGE_FLAG_NONE);*/
+  } else { /* ... */}
+}
 ```
 
 ### [Windows] MSVC Compiler Options /MD, /MT
@@ -144,7 +202,7 @@ The application id (System.AppUserModel.ID property) of a Windows 7 shortcut.
 
 In Windows 7 (or above), taskbar items are grouped by a string known as the application id or AppId. This can be set in the shortcut that launches a program, or by the application itself. See [AppUserModelIDs](http://msdn.microsoft.com/en-us/library/dd378459%28VS.85%29.aspx) for more information. There's a [tool](https://code.google.com/archive/p/win7appid/) to modify the AppUserModelID, from where we can learn to modify it in our own code.
 
-```c++
+```cpp
 EXTERN_C const PROPERTYKEY DECLSPEC_SELECTANY PKEY_AppUserModel_ID = {
     {0x9F4C2855,
      0x9F79,
