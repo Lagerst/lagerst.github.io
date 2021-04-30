@@ -48,10 +48,30 @@ Crashpad additionally provides minimal facilities for clients to adorn their cra
 
 **MacOS**
 
-Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future.
+Use [STPrivilegedTask](https://github.com/sveinbjornt/STPrivilegedTask) which is deprecated but can still be used, or [SMJobBless](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html) which is complicated but less likely to be deprecated in the future. Or use [base/mac/authorization_util.h](https://source.chromium.org/chromium/chromium/src/+/main:base/mac/authorization_util.h) which also use deprecated methods. 
+> AuthorizationExecuteWithPrivileges is deprecated in macOS 10.7, but no good replacement exists. https://crbug.com/593133. 
+
+To custom text or icon on poped dialog in ***STPrivilegedTask***, call
+```obj-c
+NSString* dialogText = @"Needs permission to upgrade";
+AuthorizationEnvironment customAuthorizationEnvironment;
+customAuthorizationEnvironment.items = kAuthEnv;
+customAuthorizationEnvironment.count = 1;
+
+// The OS will dispay |prompt| along with a sentence asking the user to type
+// the "password to allow this."
+const char* prompt_c = [dialogText UTF8String];
+size_t prompt_length = prompt_c ? strlen(prompt_c) : 0;
+
+kAuthEnv[0].name = kAuthorizationEnvironmentPrompt;
+kAuthEnv[0].valueLength = prompt_length;
+kAuthEnv[0].value = (void *)prompt_c;
+kAuthEnv[0].flags = 0;
+```
+where the value should be a localized UTF-8 string. See [AuthorizationEnvironment](https://developer.apple.com/documentation/security/authorizationenvironment?language=objc) and [kAuthorizationEnvironmentPrompt](https://developer.apple.com/documentation/security/kauthorizationenvironmentprompt?changes=_8&language=objc).
 
 Special Notes:
-On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to aceess, since file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. while some files may be overwriten by deleting & recreating, so they will also have the problem.
+On posix system files created by privieged task via base::File::FLAG_CREATE in chromium/src/base/file.h will be locked for only root user to access. The file is created with default mode `int mode = S_IRUSR | S_IWUSR;`, which only allow the current user to read and write. Unfortunately, the current user is root, and when normal user launch the app it cannot access the file and might never be able to read/write the file, which is fatal to some settings stored on local disk. So avoid such operation in privileged tasks. Meanwhile some files may be overwriten by deleting & recreating, so they will also face the problem.
 
 **Windows**
 
@@ -261,7 +281,7 @@ if (credits != nil) {
     orderFrontStandardAboutPanelWithOptions:options];
 ```
 
-This will set the about panel options. This will override the values defined in the app's `.plist` file on macOS. See the [Apple](https://developer.apple.com/documentation/appkit/nsapplication/1428479-orderfrontstandardaboutpanelwith?preferredLanguage=occ) docs for more details. On Linux `GTK_ABOUT_DIALOG` is used, and values must be set in order to be shown; there are no defaults.
+This will set the about panel options. This will override the values defined in the app's `.plist` file on macOS. See the [Apple Docs](https://developer.apple.com/documentation/appkit/nsapplication/1428479-orderfrontstandardaboutpanelwith?preferredLanguage=occ) for more details. On Linux `GTK_ABOUT_DIALOG` is used, and values must be set in order to be shown; there are no defaults.
 
 If you do not set credits but still wish to surface them in your app, AppKit will look for a file named "Credits.html", "Credits.rtf", and "Credits.rtfd", in that order, in the bundle returned by the NSBundle class method main. The first file found is used, and if none is found, the info area is left blank. See Apple documentation for more information.
 
