@@ -425,16 +425,18 @@ Thanks for your reading!
 
 _About Me:_
 
-**University of Electronic Science and Technology of China** - Chengdu, Sichuan, China
+**Lark Team, ByteDance** - Beijing, China
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;09/2017 - 06/2021 Bachelor of Software Engineering;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;07/2021 - now&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Full-time Software Engineer
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;03/2020 - 06/2021 Intern
 
 **University of Texas at Austin** - Austin, Texas, United States
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;07/2019 - 08/2019 Academic Visitor;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;07/2019 - 08/2019 Academic Visitor
 
-**ByteDance** - Beijing, China
+**University of Electronic Science and Technology of China** - Chengdu, Sichuan, China
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;03/2020 - 04/2021 Intern at Lark Team.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;09/2017 - 06/2021 Bachelor of Software Engineering
 
 [E-mail](mailto:pzw9908@outlook.com) me if there's any problem.
