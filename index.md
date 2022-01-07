@@ -425,11 +425,15 @@ Thanks for your reading!
 
 _About Me:_
 
+**National University of Singapore** - Singapore
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;01/2022 - now&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Master of Computing
+
 **Lark Team, ByteDance** - Beijing, China
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;07/2021 - now&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Full-time Software Engineer
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;07/2021 - 12/2021 Software Engineer
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;03/2020 - 06/2021 Intern
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;03/2020 - 06/2021 Software Engineer (Intern)
 
 **University of Texas at Austin** - Austin, Texas, United States
 
