@@ -1,3 +1,3 @@
 ## Welcome
 
-[return to index](./index.html)
+## [return to index](./index.html)

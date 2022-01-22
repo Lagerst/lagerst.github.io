@@ -63,4 +63,4 @@ _About Me:_
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;09/2017 - 06/2021 Bachelor of Software Engineering
 
-[E-mail](mailto:pzw9908@outlook.com) me if there's any problem.
+[E-mail me](mailto:pzw9908@outlook.com) if there's any problem.
