@@ -164,3 +164,10 @@ How to Choose Parameter Values?
 1. Informed by results of EDA
 2. Density of data points has intuitive semantic meaning
 3. Intuitive interpretations of meaningful parameter value
+
+**K-means VS DBSCan**
+> https://www.geeksforgeeks.org/difference-between-k-means-and-dbscan-clustering
+
+K-means Clustering is more efficient for large datasets. DBSCan Clustering can not efficiently handle high dimensional datasets. 4. K-means Clustering does not work well with outliers and noisy datasets. DBScan clustering efficiently handles outliers and noisy datasets.
+
+Kmeans is a least-squares optimization, whereas DBSCAN finds density-connected regions.Which technique is appropriate to use depends on your data and objectives. If you want to minimize least squares, use k-means. If you want to find density-connected regions use DBSCAN.
