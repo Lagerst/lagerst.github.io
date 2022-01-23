@@ -4,7 +4,7 @@
 
 ## Lecture 1 — Introduction & Overview
 
-**What is Knowledge Discovery & Data Mining**
+**What is Knowledge Discovery & Data Mining?**
 
 data -> information -> knowledge -> wisdom
 
@@ -86,7 +86,7 @@ Identify Noise/Outliers
    3. Normalization 标准化，如 平均值·标准差 缩放
 4. Data Discretization 离散化
    1. Converting continuous attributes into ordinal attributes. Example: Convert weight to a weight category
-   2. Converting categorical attributes into numerical attributes. Example: Convert {1, 2, 3} to {{0, 1}, {0, 1}, {0, 1}}
+   2. Converting categorical attributes into numerical attributes. Example: Convert \{1, 2, 3\} to "\{\{0, 1\}, \{0, 1\}, \{0, 1\}\}"
 
 ## Lecture 2 — Clustering
 

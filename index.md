@@ -2,11 +2,11 @@
 
 ### [Cross-Platform Desktop Development](./CrossPlatform.html)
 
-### [NUS] [CS5223] [Distributed Systems](./NUSCS5223.html)
+### [NUS-CS5223 Distributed Systems](./NUSCS5223.html)
 
-### [NUS] [CS5228] [Knowledge Discovery and Data Mining](./NUSCS5228.html)
+### [NUS-CS5228 Knowledge Discovery and Data Mining](./NUSCS5228.html)
 
-### [NUS] [IS5152] [Data-Driven Decision Making](./NUSIS5152.html)
+### [NUS-IS5152 Data-Driven Decision Making](./NUSIS5152.html)
 
 ### [Final] Tada & About Me
 
