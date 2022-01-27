@@ -165,3 +165,158 @@ To release the lock:
 
 • if Cx[i] <= Cy[i] for all i, and there exist j such that Cx[j] < Cy[j], Cx happens before Cy
 > Example: (2, 3, 2) and (3, 0, 0)
+
+## Lecture 3 Distributed State and Consistency
+
+*Cache*
+
+Why do we want caching?
+• Reduce load on a bottleneck service (exploit locality)
+• Better latency (cache is more conveniently located & hopefully faster)
+
+**NFS file system**
+
+NFS: developed by Sun Microsystems in 1984
+
+Design philosophy: simplicity
+
+*"Stateless"*
+
+    all essential information kept on file server’s disk
+
+    servers do not cache client information
+
+*Idempotent operations*
+
+    read and write at offset
+
+    lookup
+
+*NFS Update Protocol*
+
+    When a client updates a file
+
+    1. updates local cache
+    2. sends write request to server
+    3. server writes data to disks
+
+*Issues with NFS update protocol*
+
+    Performance:
+
+    • every client write request synchronously writes to server disks
+
+    Consistency:
+
+    • other client caches are not notified of the updates
+
+    • read inconsistent data
+
+    • NFS’ solution?
+
+    • periodic polling
+
+    • eventually receive updates
+
+    • affects performance
+
+**Sprite file system**
+
+Sprite: Unix-like distributed OS from Berkeley
+
+*Server tracks opened file state*
+
+    which clients are reading/writing which files
+
+    open()/close() needs to contact server
+
+*Server uses "write-back cache"*
+
+    modified blocks are kept in memory
+
+    writes back to disk after 30s
+
+*Sprite file system: consistency*
+
+    Server knows which clients are reading/writing a file.
+
+    If only one client opens a file, client does not synchronously sends updates to the server, writes back to server after 30s.
+
+    If multiple clients open a file, and at least one is writing, all reads and writes go through the server (not cacheable).
+
+*Sprite's update protocol*
+
+*Pros and cons of Sprite’s approach*
+
+    Advantages:
+
+    • consistency
+
+    • performance
+
+    Disadvantages:
+
+    • complexity
+
+    • durability and recovery
+
+    Trade-offs!
+
+**Other approaches**
+
+*Invalidation*
+
+    Writer invalidates all other cached copies
+
+*Write-update*
+
+    Writer updates all other cached copies
+
+**Consistency**
+
+Consistency: the allowed semantics (return values) of a set of
+operations to a data store or shared object.
+
+*Strength and Weakness*
+
+    Strong consistency: the system behaves as if there's just a single copy of the data. (Implementation details like caching and replication are invisible to clients.)
+
+    Weak consistency: allows behaviors significantly different from the single store model.
+
+    Eventual consistency: the aberrant behaviors are only temporary.
+
+*What's the differnece?*
+    
+    Performance
+
+    • Consistency requires synchronization/coordination when data is cached/replicated
+    • Often slower to make sure you always return the right answer
+
+    Availability
+
+    • What if client is offline, or network is not working?
+
+    • Weak/eventual consistency may be the only option.
+
+    Programmability
+    
+    • Weaker models are harder to reason against
+
+*Sequential Consistency*
+
+Requires that a history of operations be equivalent to a legal
+sequential history, where a legal sequential history is one that
+respects the local ordering at each node.
+
+serializability when applied to transactions.
+
+**Linearizability** = sequential consistency + respects real-time ordering
+
+If 𝑒1 ends before 𝑒2 begins, then 𝑒1 appears before 𝑒2 in the
+sequential history.
+
+• If they are concurrent, then any order is okay
+
+Linearizable data structures behave as if there's a single, correct copy.
+
+• One of the strongest guarantees for concurrent objects
